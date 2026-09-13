@@ -1,0 +1,44 @@
+name: Sync fork with n8n upstream
+
+on:
+  schedule:
+    # Run daily so this fork stays close to n8n-io/n8n.
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: sync-fork-with-upstream
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Merge n8n upstream master
+    if: github.repository == 'Urbee20245/n8n'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the fork
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Fetch upstream n8n
+        run: |
+          git remote add upstream https://github.com/n8n-io/n8n.git
+          git fetch --prune upstream master
+
+      - name: Merge upstream master
+        run: |
+          git merge --no-edit upstream/master
+
+      - name: Push the synchronized master branch
+        run: git push origin HEAD:master
