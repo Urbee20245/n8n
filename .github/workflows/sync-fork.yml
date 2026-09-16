@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: sync-fork
@@ -21,4 +21,4 @@ jobs:
       - name: Sync fork
         run: gh repo sync Urbee20245/n8n --source n8n-io/n8n --branch master
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.FORK_SYNC_TOKEN }}
